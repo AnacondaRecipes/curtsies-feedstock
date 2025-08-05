@@ -13,6 +13,11 @@ build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   skip: True  # [py<310]
+  # ModuleNotFoundError: No module named 'termios'
+  # https://docs.python.org/3/library/tty.html
+  # Because it requires the termios module, it will work only on Unix.
+  # Issue created: https://github.com/bpython/curtsies/issues/178
+  skip: True  # [win]
 
 requirements:
   host:

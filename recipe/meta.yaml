@@ -1,5 +1,5 @@
 {% set name = "curtsies" %}
-{% set version = "0.3.4" %}
+{% set version = "0.4.3" %}
 
 package:
   name: {{ name|lower }}
@@ -7,37 +7,52 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 4ca543998d8bbba7185db099f8b7bb30baeb47426f7ac1a271e4d9ca8bbb2b05
+  sha256: 102a0ffbf952124f1be222fd6989da4ec7cce04e49f613009e5f54ad37618825
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv
-  skip: true  # [py2k]
-  skip: true  # [win]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  skip: True  # [py<310]
+  # ModuleNotFoundError: No module named 'termios'
+  # https://docs.python.org/3/library/tty.html
+  # Because it requires the termios module, it will work only on Unix.
+  # Issue created: https://github.com/bpython/curtsies/issues/178
+  skip: True  # [win]
 
 requirements:
   host:
     - pip
     - python
+    - wheel
+    - setuptools >=46.4.0
   run:
-    - blessings >=1.5
     - python
-    - wcwidth >=0.1.4
+    - blessed >=1.5
+    - cwcwidth
 
 test:
+  source_files:
+    - tests
   imports:
     - curtsies
+  commands:
+    - pip check
+    - pytest -v tests
   requires:
-    - mock
-    - nose
+    - pip
+    - pytest
     - pyte
 
 about:
   home: https://github.com/bpython/curtsies
+  summary: Curses-like terminal wrapper, with colored strings!
   license: MIT
   license_family: MIT
   license_file: LICENSE
-  summary: Curses-like terminal wrapper, with colored strings!
+  description: |
+    Curtsies is a Python 3.6+ compatible library for interacting with the terminal.
+  dev_url: https://github.com/bpython/curtsies
+  doc_url: https://github.com/bpython/curtsies/tree/main/docs
 
 extra:
   recipe-maintainers:
